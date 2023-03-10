@@ -1,0 +1,2 @@
+json_key_file "./fastlane/google-playstore-api-creds.json"
+package_name "com.hodari"

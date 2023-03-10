@@ -1,0 +1,50 @@
+platform :ios do
+  desc 'Build the iOS application'
+  lane :build do
+    setup_ci if ENV['CI']
+    match(app_identifier: 'com.hodari', type: 'appstore', readonly: true)
+    increment_version_number(version_number: ENV['VERSION_NUMBER'], xcodeproj: './ios/hodari.xcodeproj')
+    build_app(scheme: 'hodari', workspace: './ios/hodari.xcworkspace', silent: true, suppress_xcode_output: true)
+  end
+  
+  desc 'Ship to Testflight'
+  lane :beta do
+    build
+    api_key = app_store_connect_api_key
+    upload_to_testflight(api_key: api_key)
+  end
+  
+  desc 'Deploy to App Store'
+  lane :release do
+    build
+    api_key = app_store_connect_api_key
+    upload_to_app_store(
+      api_key: api_key,
+      precheck_include_in_app_purchases: false,
+      force: true
+    )
+  end
+end
+
+platform :android do
+  desc 'Build the Android application'
+  lane :build do
+    gradle(task: 'clean', project_dir: 'android/')
+    gradle(task: 'bundle', project_dir: 'android/', build_type: 'Release')
+  end
+
+  desc 'Ship to Playstore Beta track'
+  lane :beta do
+    build
+    Spaceship::ConnectAPI::App.const_set('ESSENTIAL_INCLUDES', 'appStoreVersions')
+    upload_to_play_store(track: 'beta', track_promote_to: 'beta')
+  end
+
+  desc 'Ship to Playstore Production'
+  lane :release do
+    build
+    Spaceship::ConnectAPI::App.const_set('ESSENTIAL_INCLUDES', 'appStoreVersions')
+    upload_to_play_store
+  end
+end
+
