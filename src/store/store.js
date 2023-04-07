@@ -1,10 +1,12 @@
 import {atom, selector} from 'recoil';
 
 import {storage} from './storage';
+import {cleanString} from '../utils/string';
 
 const appState = atom({
   key: 'app',
-  default: {},
+  default: storage.getObject('app', {}),
+  effects_UNSTABLE: [({onSet}) => onSet(app => storage.setObject('app', app))],
 });
 
 const chantsState = atom({
@@ -68,17 +70,11 @@ const favoriteFilterState = atom({
   default: false,
 });
 
-const chantsIndexState = atom({
-  key: 'chantsIndexState',
-  default: null,
-});
-
 const chantsFilteredState = selector({
   key: 'chantsFiltered',
   get: ({get}) => {
     let chants = get(chantsState);
     const searchFilter = get(searchFilterState);
-    const chantsIndex = get(chantsIndexState);
     const categoryFilter = get(categoryFilterState);
     const favorites = get(favoritesState);
     const favoriteFilter = get(favoriteFilterState);
@@ -87,14 +83,8 @@ const chantsFilteredState = selector({
       return chants;
     }
 
-    if (searchFilter && chantsIndex) {
-      chants = chantsIndex
-        .search(searchFilter, {limit: Infinity})
-        .map(id => chants[id]);
-    }
-
     return chants.filter(chant => {
-      const {id = '', categories = []} = chant;
+      const {id = '', categories = [], clean} = chant;
 
       if (favoriteFilter) {
         if (!favorites.includes(id)) {
@@ -103,6 +93,12 @@ const chantsFilteredState = selector({
       }
       if (categoryFilter.length) {
         if (!categories.some(c => categoryFilter.includes(c))) {
+          return false;
+        }
+      }
+      if (searchFilter) {
+        const keyword = cleanString(searchFilter);
+        if (!clean.title.includes(keyword) && !clean.chant.includes(keyword)) {
           return false;
         }
       }
@@ -120,6 +116,5 @@ export {
   searchFilterState,
   categoryFilterState,
   chantsFilteredState,
-  chantsIndexState,
   favoriteFilterState,
 };

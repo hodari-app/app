@@ -1,4 +1,4 @@
-import React, {useTransition} from 'react';
+import React from 'react';
 import {SafeAreaView, StatusBar, StyleSheet, View} from 'react-native';
 import {Searchbar, Text} from 'react-native-paper';
 import {useRecoilValue, useSetRecoilState} from 'recoil';
@@ -23,6 +23,8 @@ function ChantsList() {
         style={styles.searchBar}
         placeholder="Rechercher un chant..."
         onChangeText={setSearchFilter}
+        clearIcon="close"
+        onClearIconPress={() => setSearchFilter('')}
       />
       <Filters />
       <View style={styles.actionBar}>

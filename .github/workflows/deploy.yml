@@ -77,7 +77,7 @@ jobs:
 
       - name: Create properties file
         run: |
-          mkdir ~/.gradle
+          mkdir -p ~/.gradle
           echo "${{ secrets.HODARI_GRADLE_PROPERTIES }}" > ~/.gradle/gradle.properties
 
       - name: Setup Ruby
