@@ -6,7 +6,8 @@ const regexs = [
   [/[ùúûüű]/g, 'u'],
   [/[ýŷÿ]/g, 'y'],
   [/ñ/g, 'n'],
-  [/[çc]/g, 'c'],
+  [/[ç]/g, 'c'],
+  [/\n/g, ' '],
 ];
 
 function cleanString(str) {

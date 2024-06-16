@@ -1,7 +1,10 @@
 import {atom, selector} from 'recoil';
+import * as Sentry from '@sentry/react-native';
 
 import {storage} from './storage';
 import {cleanString} from '../utils/string';
+import * as schema from './schema';
+import {db} from './database';
 
 const appState = atom({
   key: 'app',
@@ -9,11 +12,24 @@ const appState = atom({
   effects_UNSTABLE: [({onSet}) => onSet(app => storage.setObject('app', app))],
 });
 
+const loadChants = selector({
+  key: 'loadChantsFromDB',
+  get: () => db.select().from(schema.chants),
+});
+
 const chantsState = atom({
   key: 'chants',
-  default: storage.getObject('chants', []),
+  default: loadChants,
   effects_UNSTABLE: [
-    ({onSet}) => onSet(chants => storage.setObject('chants', chants)),
+    ({onSet}) =>
+      onSet(async chants => {
+        try {
+          await db.delete(schema.chants);
+          await db.insert(schema.chants).values(chants);
+        } catch (e) {
+          Sentry.captureException(e);
+        }
+      }),
   ],
 });
 
@@ -70,40 +86,58 @@ const favoriteFilterState = atom({
   default: false,
 });
 
+const chantsCleanedState = selector({
+  key: 'chantsCleanedState',
+  get: ({get}) => {
+    const chants = get(chantsState);
+    return chants.map(chant => ({
+      ...chant,
+      clean: {
+        title: cleanString(chant.title),
+        body: cleanString(chant.body),
+      },
+    }));
+  },
+});
+
 const chantsFilteredState = selector({
   key: 'chantsFiltered',
   get: ({get}) => {
-    let chants = get(chantsState);
+    let chants = get(chantsCleanedState);
     const searchFilter = get(searchFilterState);
     const categoryFilter = get(categoryFilterState);
     const favorites = get(favoritesState);
     const favoriteFilter = get(favoriteFilterState);
 
-    if (!searchFilter && !categoryFilter.length && !favoriteFilter) {
+    if (searchFilter.length < 3 && !categoryFilter.length && !favoriteFilter) {
       return chants;
     }
 
-    return chants.filter(chant => {
+    const title = [],
+      body = [];
+    for (const chant of chants) {
       const {id = '', categories = [], clean} = chant;
 
-      if (favoriteFilter) {
-        if (!favorites.includes(id)) {
-          return false;
-        }
+      if (favoriteFilter && favorites.includes(id)) {
+        title.push(chant);
       }
-      if (categoryFilter.length) {
-        if (!categories.some(c => categoryFilter.includes(c))) {
-          return false;
-        }
+      if (
+        categoryFilter.length &&
+        categories.some(c => categoryFilter.includes(c))
+      ) {
+        title.push(chant);
       }
       if (searchFilter) {
         const keyword = cleanString(searchFilter);
-        if (!clean.title.includes(keyword) && !clean.chant.includes(keyword)) {
-          return false;
+        if (clean.title.includes(keyword)) {
+          title.push(chant);
+        } else if (clean.body.includes(keyword)) {
+          body.push(chant);
         }
       }
-      return true;
-    });
+    }
+
+    return title.concat(body);
   },
 });
 

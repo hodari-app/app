@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React, {Fragment, useEffect, useState, useTransition} from 'react';
 import {ScrollView, StyleSheet, View} from 'react-native';
 import Markdown from '@ronradtke/react-native-markdown-display';
 import {Appbar, Text, useTheme} from 'react-native-paper';
@@ -11,10 +11,12 @@ function Chant({navigation, route}) {
   const {id} = route.params;
   const theme = useTheme();
   const chants = useRecoilValue(chantsState);
+  const [chant, setChant] = useState();
+  const [pending, startTransition] = useTransition();
   const [favorites, setFavorites] = useRecoilState(favoritesState);
   const [fontSize, setFontSize] = useState(18);
 
-  const {chant, ...metadata} = chants.find(c => c.id === id) || {chant: ''};
+  const {body, ...metadata} = chant || {body: ''};
   const isFavorite = favorites.includes(id);
 
   const toggleFavorite = () => {
@@ -49,6 +51,16 @@ function Chant({navigation, route}) {
     });
   }, [navigation, favorites]);
 
+  useEffect(() => {
+    startTransition(() => {
+      setChant(chants.find(c => c.id === id));
+    });
+  }, [id]);
+
+  if (pending) {
+    return <Fragment />;
+  }
+
   return (
     <ScrollView
       contentInsetAdjustmentBehavior="automatic"
@@ -57,19 +69,19 @@ function Chant({navigation, route}) {
       <Text variant="headlineSmall" style={styles.title}>
         {metadata.title}
       </Text>
-      {chant ? (
+      {body ? (
         <Markdown
           style={{
             body: {color: theme.colors.onSurface, fontSize, lineHeight: 26},
           }}>
-          {chant}
+          {body}
         </Markdown>
       ) : null}
-      {metadata?.youtube ? (
+      {metadata?.videoUrl ? (
         <View style={styles.video} renderToHardwareTextureAndroid>
           <YoutubePlayer
             height={190}
-            videoId={metadata.youtube.split('=').pop()}
+            videoId={metadata.videoUrl.split('=').pop()}
             play={false}
           />
         </View>
