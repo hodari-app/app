@@ -1,17 +1,13 @@
 import React, {Suspense} from 'react';
 import {SafeAreaView, StatusBar, StyleSheet} from 'react-native';
-import {Searchbar, Text} from 'react-native-paper';
-import {useRecoilValue, useSetRecoilState} from 'recoil';
+import {Text} from 'react-native-paper';
 
-import {chantsLoadingState, searchFilterState} from '../../store/store';
+import SearchBar from './SearchBar';
 import Chants from './Chants';
 import Filters from './Filters';
 import Empty from './Empty';
 
 function ChantsList() {
-  const setSearchFilter = useSetRecoilState(searchFilterState);
-  const {loading} = useRecoilValue(chantsLoadingState);
-
   const fallback = (
     <Empty>
       <Text>Chargement...</Text>
@@ -20,14 +16,7 @@ function ChantsList() {
 
   return (
     <SafeAreaView style={styles.container}>
-      <Searchbar
-        loading={loading}
-        style={styles.searchBar}
-        placeholder="Rechercher un chant..."
-        onChangeText={setSearchFilter}
-        clearIcon="close"
-        onClearIconPress={() => setSearchFilter('')}
-      />
+      <SearchBar />
       <Suspense fallback={fallback}>
         <Filters />
         <Chants />
@@ -40,9 +29,6 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     marginTop: StatusBar.currentHeight + 10,
-  },
-  searchBar: {
-    marginHorizontal: 10,
   },
 });
 
