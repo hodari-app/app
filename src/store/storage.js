@@ -19,5 +19,6 @@ storage.getObject = function (key, defaultValue) {
     return defaultValue;
   }
 };
+storage.delete('chants');
 
 export {storage};

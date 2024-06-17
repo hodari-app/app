@@ -1,10 +1,8 @@
 import {atom, selector} from 'recoil';
-import * as Sentry from '@sentry/react-native';
 
 import {storage} from './storage';
 import {cleanString} from '../utils/string';
-import * as schema from './schema';
-import {db} from './database';
+import * as db from './database';
 
 const appState = atom({
   key: 'app',
@@ -14,23 +12,13 @@ const appState = atom({
 
 const loadChants = selector({
   key: 'loadChantsFromDB',
-  get: () => db.select().from(schema.chants),
+  get: () => db.getChants(),
 });
 
 const chantsState = atom({
   key: 'chants',
   default: loadChants,
-  effects_UNSTABLE: [
-    ({onSet}) =>
-      onSet(async chants => {
-        try {
-          await db.delete(schema.chants);
-          await db.insert(schema.chants).values(chants);
-        } catch (e) {
-          Sentry.captureException(e);
-        }
-      }),
-  ],
+  effects_UNSTABLE: [({onSet}) => onSet(chants => db.setChants(chants))],
 });
 
 const chantsLoadingState = atom({

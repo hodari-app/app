@@ -1,6 +1,6 @@
 import React, {useMemo} from 'react';
-import {ActivityIndicator, FlatList, StyleSheet, View} from 'react-native';
-import {Button, List, Text} from 'react-native-paper';
+import {FlatList, StyleSheet, View} from 'react-native';
+import {ActivityIndicator, Button, List, Text} from 'react-native-paper';
 import {useNavigation} from '@react-navigation/native';
 import {useRecoilValue} from 'recoil';
 

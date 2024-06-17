@@ -1,7 +1,8 @@
 import React, {useEffect, useRef} from 'react';
-import {View, Text} from 'react-native';
+import {View} from 'react-native';
 import {createNativeStackNavigator} from '@react-navigation/native-stack';
 import {useMigrations} from 'drizzle-orm/op-sqlite/migrator';
+import * as Sentry from '@sentry/react-native';
 
 import {useLoadChants} from './hooks/loadChants';
 import ChantsList from './containers/List/ChantsList';
@@ -18,27 +19,21 @@ const Routes = () => {
   const loadChants = useLoadChants();
 
   useEffect(() => {
-    if (loadedEntities.current) {
+    if (loadedEntities.current || !success) {
       return;
     }
     loadedEntities.current = true;
     loadChants();
-  }, []);
+  }, [success]);
 
   if (error) {
-    return (
-      <View>
-        <Text>Migration error: {error.message}</Text>
-      </View>
-    );
+    // TODO: reset db
+    Sentry.captureException(error);
+    return <View />;
   }
 
   if (!success) {
-    return (
-      <View>
-        <Text>Migration is in progress...</Text>
-      </View>
-    );
+    return <View />;
   }
 
   return (
