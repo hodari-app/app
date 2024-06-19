@@ -1,24 +1,22 @@
-import {
-  useRecoilState,
-  useRecoilStateLoadable,
-  useSetRecoilState,
-} from 'recoil';
+import {useRecoilState, useSetRecoilState} from 'recoil';
 import * as Sentry from '@sentry/react-native';
 
 import {getChants, getInfo} from '../api/chants';
 import {appState, chantsLoadingState, chantsState} from '../store/store';
+import * as db from '../store/database';
 
 function useLoadChants() {
-  const [{contents}, setChants] = useRecoilStateLoadable(chantsState);
+  const setChants = useSetRecoilState(chantsState);
   const setLoading = useSetRecoilState(chantsLoadingState);
   const [app, setApp] = useRecoilState(appState);
 
   return async function load() {
     setLoading({loading: true, error: false});
-    const chants = await contents;
+    const chants = await db.getChants();
     try {
       const appInfo = await getInfo();
       if (appInfo.version === app.version && chants.length) {
+        setChants(chants);
         setLoading({loading: false, error: false});
         return;
       }

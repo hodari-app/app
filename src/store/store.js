@@ -10,14 +10,9 @@ const appState = atom({
   effects_UNSTABLE: [({onSet}) => onSet(app => storage.setObject('app', app))],
 });
 
-const loadChants = selector({
-  key: 'loadChantsFromDB',
-  get: () => db.getChants(),
-});
-
 const chantsState = atom({
   key: 'chants',
-  default: loadChants,
+  default: [],
   effects_UNSTABLE: [({onSet}) => onSet(chants => db.setChants(chants))],
 });
 
