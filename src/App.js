@@ -15,6 +15,7 @@ Sentry.init({
   // We recommend adjusting this value in production.
   tracesSampleRate: 1.0,
   enabled: !__DEV__,
+  debug: __DEV__,
 });
 
 function App() {

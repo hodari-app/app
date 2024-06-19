@@ -1,8 +1,9 @@
 import React, {useMemo} from 'react';
-import {FlatList, StyleSheet, View} from 'react-native';
+import {StyleSheet, View} from 'react-native';
 import {ActivityIndicator, Button, List, Text} from 'react-native-paper';
 import {useNavigation} from '@react-navigation/native';
 import {useRecoilValue} from 'recoil';
+import {FlashList} from '@shopify/flash-list';
 
 import {
   chantsFilteredState,
@@ -51,7 +52,7 @@ function Chants() {
       <View style={styles.actionBar}>
         <Text>{filtered.length} chants</Text>
       </View>
-      <FlatList
+      <FlashList
         data={filtered}
         renderItem={({item}) => (
           <List.Item
@@ -61,11 +62,7 @@ function Chants() {
           />
         )}
         keyExtractor={item => item.id}
-        getItemLayout={(_, index) => ({
-          length: ITEM_HEIGHT,
-          offset: ITEM_HEIGHT * index,
-          index,
-        })}
+        estimatedItemSize={ITEM_HEIGHT}
         keyboardShouldPersistTaps="always"
         ListEmptyComponent={EmptyList}
       />
