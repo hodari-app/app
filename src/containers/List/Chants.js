@@ -2,7 +2,7 @@ import React, {useMemo} from 'react';
 import {StyleSheet, View} from 'react-native';
 import {ActivityIndicator, Button, List, Text} from 'react-native-paper';
 import {useNavigation} from '@react-navigation/native';
-import {useRecoilValue} from 'recoil';
+import {useAtomValue} from 'jotai';
 import {FlashList} from '@shopify/flash-list';
 
 import {
@@ -19,9 +19,9 @@ function Chants() {
   const navigation = useNavigation();
   const loadChants = useLoadChants();
 
-  const chants = useRecoilValue(chantsState);
-  const {error} = useRecoilValue(chantsLoadingState);
-  const filtered = useRecoilValue(chantsFilteredState);
+  const chants = useAtomValue(chantsState);
+  const {error} = useAtomValue(chantsLoadingState);
+  const filtered = useAtomValue(chantsFilteredState);
 
   const EmptyList = () =>
     useMemo(

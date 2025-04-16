@@ -1,26 +1,27 @@
-import {useRecoilState, useSetRecoilState} from 'recoil';
-import * as Sentry from '@sentry/react-native';
+import {useAtom, useSetAtom} from 'jotai';
+// import * as Sentry from '@sentry/react-native';
 
 import {getChants, getInfo} from '../api/chants';
 import {appState, chantsLoadingState, chantsState} from '../store/store';
 import * as db from '../store/database';
 
 function useLoadChants() {
-  const setChants = useSetRecoilState(chantsState);
-  const setLoading = useSetRecoilState(chantsLoadingState);
-  const [app, setApp] = useRecoilState(appState);
+  const setChants = useSetAtom(chantsState);
+  const setLoading = useSetAtom(chantsLoadingState);
+  const [app, setApp] = useAtom(appState);
 
   return async function load() {
-    setLoading({loading: true, error: false});
+    setLoading({loading: false, error: false});
     const chants = await db.getChants();
     try {
+      setChants(chants);
+
       const appInfo = await getInfo();
       if (appInfo.version === app.version && chants.length) {
-        setChants(chants);
-        setLoading({loading: false, error: false});
         return;
       }
 
+      setLoading({loading: true, error: false});
       const response = await getChants();
 
       const formated = response.chants.map(
@@ -38,8 +39,8 @@ function useLoadChants() {
 
       setLoading({loading: false, error: false});
     } catch (e) {
-      Sentry.captureException(e);
-      setLoading({loading: false, error: true});
+      // Sentry.captureException(e);
+      setLoading({loading: false, error: !chants.length});
     }
   };
 }

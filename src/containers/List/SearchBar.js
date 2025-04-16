@@ -1,13 +1,13 @@
 import React from 'react';
 import {StyleSheet} from 'react-native';
 import {Searchbar} from 'react-native-paper';
-import {useRecoilValue, useRecoilState} from 'recoil';
+import {useAtom, useAtomValue} from 'jotai';
 
 import {chantsLoadingState, searchFilterState} from '../../store/store';
 
 function SearchBar() {
-  const [searchFilter, setSearchFilter] = useRecoilState(searchFilterState);
-  const {loading} = useRecoilValue(chantsLoadingState);
+  const [searchFilter, setSearchFilter] = useAtom(searchFilterState);
+  const {loading} = useAtomValue(chantsLoadingState);
 
   return (
     <Searchbar

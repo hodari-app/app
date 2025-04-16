@@ -34,6 +34,7 @@ sentry.properties
 .cxx/
 *.keystore
 !debug.keystore
+.kotlin/
 
 # node.js
 #

@@ -3,17 +3,17 @@ import {ScrollView, StyleSheet, View} from 'react-native';
 import Markdown from '@ronradtke/react-native-markdown-display';
 import {Appbar, Text, useTheme} from 'react-native-paper';
 import YoutubePlayer from 'react-native-youtube-iframe';
-import {useRecoilState, useRecoilValue} from 'recoil';
+import {useAtom, useAtomValue} from 'jotai';
 
 import {chantsState, favoritesState} from '../store/store';
 
 function Chant({navigation, route}) {
   const {id} = route.params;
   const theme = useTheme();
-  const chants = useRecoilValue(chantsState);
+  const chants = useAtomValue(chantsState);
   const [chant, setChant] = useState();
   const [pending, startTransition] = useTransition();
-  const [favorites, setFavorites] = useRecoilState(favoritesState);
+  const [favorites, setFavorites] = useAtom(favoritesState);
   const [fontSize, setFontSize] = useState(18);
 
   const {body, ...metadata} = chant || {body: ''};
@@ -36,6 +36,10 @@ function Chant({navigation, route}) {
       <Appbar.Action
         icon="format-font-size-increase"
         onPress={() => setFontSize(c => c + 1)}
+      />
+      <Appbar.Action
+        icon="pencil"
+        onPress={() => navigation.navigate('Edit', {id})}
       />
       <Appbar.Action
         icon={isFavorite ? 'heart' : 'heart-outline'}
@@ -94,18 +98,15 @@ const styles = StyleSheet.create({
   scrollContainer: {
     height: '100%',
     paddingVertical: 10,
-    paddingHorizontal: 15,
   },
   container: {
-    paddingBottom: 80,
+    paddingHorizontal: 10,
   },
   title: {
-    marginTop: 10,
-    marginBottom: 15,
+    marginBottom: 10,
   },
   video: {
-    marginTop: 30,
-    height: 190,
+    marginTop: 10,
   },
 });
 

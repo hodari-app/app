@@ -1,7 +1,7 @@
 import React, {useCallback, useMemo, useRef} from 'react';
 import {StyleSheet, View} from 'react-native';
 import {Chip, Portal, useTheme} from 'react-native-paper';
-import {useRecoilState, useRecoilValue} from 'recoil';
+import {useAtom, useAtomValue} from 'jotai';
 import BottomSheet, {
   BottomSheetBackdrop,
   BottomSheetScrollView,
@@ -16,12 +16,10 @@ import {
 
 function Filters() {
   const theme = useTheme();
-  const categories = useRecoilValue(categoriesState);
-  const [categoryFilter, setCategoryFilter] =
-    useRecoilState(categoryFilterState);
-  const [favoriteFilter, setFavoriteFilter] =
-    useRecoilState(favoriteFilterState);
-  const app = useRecoilValue(appState);
+  const categories = useAtomValue(categoriesState);
+  const [categoryFilter, setCategoryFilter] = useAtom(categoryFilterState);
+  const [favoriteFilter, setFavoriteFilter] = useAtom(favoriteFilterState);
+  const app = useAtomValue(appState);
 
   const bottomSheetRef = useRef(null);
   const snapPoints = useMemo(() => ['75%'], []);
@@ -98,22 +96,17 @@ function Filters() {
 const styles = StyleSheet.create({
   filterBar: {
     flexDirection: 'row',
-    paddingTop: 10,
-    marginLeft: 10,
+    paddingHorizontal: 10,
+    paddingVertical: 5,
   },
   filterChip: {
-    marginLeft: 10,
+    marginRight: 5,
   },
   sheet: {
-    flex: 1,
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    paddingRight: 15,
-    paddingBottom: 40,
+    padding: 10,
   },
   category: {
-    marginLeft: 10,
-    marginTop: 10,
+    margin: 5,
   },
 });
 

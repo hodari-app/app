@@ -2,11 +2,13 @@ import React, {useEffect, useRef} from 'react';
 import {View} from 'react-native';
 import {createNativeStackNavigator} from '@react-navigation/native-stack';
 import {useMigrations} from 'drizzle-orm/op-sqlite/migrator';
-import * as Sentry from '@sentry/react-native';
+// import * as Sentry from '@sentry/react-native';
 
 import {useLoadChants} from './hooks/loadChants';
 import ChantsList from './containers/List/ChantsList';
 import Chant from './containers/Chant';
+import Edit from './containers/Edition/Edit';
+import Diff from './containers/Edition/Diff';
 import Webview from './containers/Webview';
 import {db} from './store/database';
 import migrations from './store/migrations/migrations';
@@ -24,11 +26,11 @@ const Routes = () => {
     }
     loadedEntities.current = true;
     loadChants();
-  }, [success]);
+  }, [success, loadChants]);
 
   if (error) {
     // TODO: reset db
-    Sentry.captureException(error);
+    // Sentry.captureException(error);
     return <View />;
   }
 
@@ -44,6 +46,8 @@ const Routes = () => {
         component={ChantsList}
       />
       <Main.Screen name="Chant" options={{title: ''}} component={Chant} />
+      <Main.Screen name="Edit" options={{title: ''}} component={Edit} />
+      <Main.Screen name="Diff" options={{title: ''}} component={Diff} />
       <Main.Screen name="Webview" component={Webview} />
     </Main.Navigator>
   );
