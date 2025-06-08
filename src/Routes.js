@@ -41,7 +41,7 @@ const Routes = () => {
   return (
     <Main.Navigator initialRouteName="TabNavigator">
       <Main.Screen
-        options={{headerShown: false}}
+        options={{headerShown: false, title: 'Chants'}}
         name="TabNavigator"
         component={ChantsList}
       />

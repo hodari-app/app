@@ -5,11 +5,7 @@ import {useNavigation} from '@react-navigation/native';
 import {useAtomValue} from 'jotai';
 import {FlashList} from '@shopify/flash-list';
 
-import {
-  chantsFilteredState,
-  chantsLoadingState,
-  chantsState,
-} from '../../store/store';
+import {chantsFilteredState, chantsLoadingState} from '../../store/store';
 import Empty from './Empty';
 import {useLoadChants} from '../../hooks/loadChants';
 
@@ -19,7 +15,6 @@ function Chants() {
   const navigation = useNavigation();
   const loadChants = useLoadChants();
 
-  const chants = useAtomValue(chantsState);
   const {error} = useAtomValue(chantsLoadingState);
   const filtered = useAtomValue(chantsFilteredState);
 
@@ -27,7 +22,7 @@ function Chants() {
     useMemo(
       () => (
         <Empty>
-          {chants.length ? (
+          {filtered.length ? (
             <Text>Aucun chant ne correspond à votre recherche</Text>
           ) : error ? (
             <>
@@ -44,7 +39,7 @@ function Chants() {
           )}
         </Empty>
       ),
-      [chants.length],
+      [filtered], // eslint-disable-line react-hooks/exhaustive-deps
     );
 
   return (

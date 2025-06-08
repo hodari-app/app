@@ -53,13 +53,13 @@ function Chant({navigation, route}) {
     navigation.setOptions({
       headerRight,
     });
-  }, [navigation, favorites]);
+  }, [navigation, favorites]); // eslint-disable-line react-hooks/exhaustive-deps
 
   useEffect(() => {
     startTransition(() => {
       setChant(chants.find(c => c.id === id));
     });
-  }, [id]);
+  }, [id, chants]);
 
   if (pending) {
     return <Fragment />;

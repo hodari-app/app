@@ -34,10 +34,10 @@ const favoritesState = atom(
 );
 
 const categoriesState = atom(get => {
-  const chants = get(chantsFilteredState);
+  const filteredChants = get(chantsFilteredState);
   const categories = {};
 
-  for (const chant of chants) {
+  for (const chant of filteredChants) {
     if (!chant.categories) {
       continue;
     }
@@ -62,8 +62,7 @@ const categoryFilterState = atom([]);
 const favoriteFilterState = atom(false);
 
 const chantsCleanedState = atom(get => {
-  const chants = get(chantsState);
-  return chants.map(chant => ({
+  return get(chantsState).map(chant => ({
     ...chant,
     clean: {
       title: cleanString(chant.title),
@@ -73,10 +72,10 @@ const chantsCleanedState = atom(get => {
 });
 
 const chantsFilteredState = atom(get => {
-  const chants = get(chantsCleanedState);
+  const cleanedChants = get(chantsCleanedState);
   const searchFilter = get(searchFilterState);
   const categoryFilter = get(categoryFilterState);
-  const favorites = get(favoritesState);
+  const favoriteState = get(favoritesState);
   const favoriteFilter = get(favoriteFilterState);
 
   if (searchFilter.length < 3 && !categoryFilter.length && !favoriteFilter) {
@@ -85,10 +84,10 @@ const chantsFilteredState = atom(get => {
 
   const title = [],
     body = [];
-  for (const chant of chants) {
+  for (const chant of cleanedChants) {
     const {id = '', categories = [], clean} = chant;
 
-    if (favoriteFilter && favorites.includes(id)) {
+    if (favoriteFilter && favoriteState.includes(id)) {
       title.push(chant);
     }
     if (

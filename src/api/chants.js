@@ -12,4 +12,13 @@ function getChant(chant) {
   return fetch(`${api}/chants/${chant}.md`).then(res => res.json());
 }
 
-export {getInfo, getChants, getChant};
+function editChant(chant) {
+  return fetch(`${api}/chant/${chant.id}`, {
+    method: 'PUT',
+    body: JSON.stringify({
+      body: chant,
+    }),
+  }).then(res => res.json());
+}
+
+export {getInfo, getChants, getChant, editChant};

@@ -1,4 +1,10 @@
-import React, {Fragment, useEffect, useState, useTransition} from 'react';
+import React, {
+  Fragment,
+  useEffect,
+  useState,
+  useTransition,
+  useCallback,
+} from 'react';
 import {ScrollView, StyleSheet} from 'react-native';
 import {Appbar, TextInput} from 'react-native-paper';
 import {useAtomValue} from 'jotai';
@@ -8,6 +14,7 @@ import {chantsState} from '../../store/store';
 function Edit({navigation, route}) {
   const {id} = route.params;
   const chants = useAtomValue(chantsState);
+  const [original, setOriginal] = useState({});
   const [chant, setChant] = useState({});
   const [pending, startTransition] = useTransition();
 
@@ -18,25 +25,34 @@ function Edit({navigation, route}) {
         navigation.goBack();
         return;
       }
+      setOriginal({...found, body: found.body.trim()});
       setChant({...found, body: found.body.trim()});
     });
-  }, [id]);
+  }, [id, chants, navigation]);
 
-  const save = () => {
+  const save = useCallback(() => {
     navigation.navigate('Diff', {id, edited: chant});
-  };
+  }, [navigation, id, chant]);
 
-  const headerRight = () => (
-    <>
-      <Appbar.Action icon="check" onPress={save} />
-    </>
+  const hasChanges =
+    original.body !== chant.body ||
+    original.title !== chant.title ||
+    original.videoUrl !== chant.videoUrl;
+
+  const headerRight = useCallback(
+    () => (
+      <>
+        <Appbar.Action icon="check" onPress={save} disabled={!hasChanges} />
+      </>
+    ),
+    [save, hasChanges],
   );
 
   React.useEffect(() => {
     navigation.setOptions({
       headerRight,
     });
-  }, [navigation, chant]);
+  }, [navigation, headerRight]);
 
   if (pending) {
     return <Fragment />;

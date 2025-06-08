@@ -1,10 +1,28 @@
-import React, {Fragment, useEffect, useState, useTransition} from 'react';
-import {ScrollView, StyleSheet} from 'react-native';
-import {Appbar} from 'react-native-paper';
+import React, {
+  Fragment,
+  useEffect,
+  useState,
+  useTransition,
+  useCallback,
+} from 'react';
+import {Alert, ScrollView, StyleSheet, View} from 'react-native';
+import {Appbar, Text} from 'react-native-paper';
 import {useAtomValue} from 'jotai';
-import diff from 'fast-diff';
+import jsDiff from 'diff';
+import Markdown, {MarkdownIt} from '@ronradtke/react-native-markdown-display';
 
 import {chantsState} from '../../store/store';
+import {editChant} from '../../api/chants';
+import pluginIns from '../../plugins/markdown-it-ins';
+import pluginDel from '../../plugins/markdown-it-del';
+
+const markdownItInstance = new MarkdownIt({typographer: true})
+  .use(pluginIns, {
+    containerClassName: 'ins',
+  })
+  .use(pluginDel, {
+    containerClassName: 'del',
+  });
 
 function ChantDiff({navigation, route}) {
   const {id, edited} = route.params;
@@ -13,45 +31,106 @@ function ChantDiff({navigation, route}) {
   const [pending, startTransition] = useTransition();
 
   useEffect(() => {
-    console.log('useEffect');
     startTransition(() => {
-      console.log('startTransition');
       const found = chants.find(c => c.id === id);
-      console.log({found});
       if (!found) {
         navigation.goBack();
         return;
       }
       setChant({...found, body: found.body.trim()});
     });
-  }, [id]);
+  }, [id, chants, navigation]);
 
-  const save = () => {};
+  const save = useCallback(() => {
+    Alert.alert(
+      "Confirmer l'édition",
+      'Êtes-vous sûr de vouloir enregistrer ces modifications ?',
+      [
+        {
+          text: 'Annuler',
+          style: 'cancel',
+        },
+        {
+          text: 'Confirmer',
+          onPress: async () => {
+            console.log(await editChant(edited));
+            navigation.popTo('Chant', {id});
+          },
+        },
+      ],
+    );
+  }, [edited, navigation, id]);
 
-  const headerRight = () => (
-    <>
-      <Appbar.Action icon="check" onPress={save} />
-    </>
+  const headerRight = useCallback(
+    () => <Appbar.Action icon="check" onPress={save} />,
+    [save],
   );
 
   React.useEffect(() => {
     navigation.setOptions({
       headerRight,
     });
-  }, [navigation]);
+  }, [navigation, headerRight]);
 
   if (pending || !chant?.body || !edited?.body) {
     return <Fragment />;
   }
-  console.log(chant.body, edited.body);
-  console.log(diff(chant.body, edited.body));
+
+  const hunksBody = jsDiff.diffJson(chant.body, edited.body);
+  const titleChanged = edited.title !== chant.title;
+  const videoChanged = edited.videoUrl !== chant.videoUrl;
+
+  const ins = (node, children) => (
+    <Text key={node.key} style={styles.added}>
+      {children}
+    </Text>
+  );
+
+  const del = (node, children) => (
+    <Text key={node.key} style={styles.removed}>
+      {children}
+    </Text>
+  );
 
   return (
     <ScrollView
-      contentInsetAdjustmentBehavior="automatic"
       style={styles.scrollContainer}
       contentContainerStyle={styles.container}>
-      <Fragment />
+      <View style={styles.title}>
+        {titleChanged ? (
+          <Text variant="headlineSmall" style={styles.removed}>
+            {chant.title}
+          </Text>
+        ) : null}
+        <Text variant="headlineSmall" style={titleChanged && styles.added}>
+          {edited.title}
+        </Text>
+      </View>
+      <Markdown
+        markdownit={markdownItInstance}
+        style={{body: styles.body}}
+        rules={{ins, del}}>
+        {hunksBody
+          .map(hunk => {
+            if (!hunk.added && !hunk.removed) {
+              return hunk.value;
+            }
+            return `${hunk.added ? '++' : '--'}${hunk.value.trim()}${
+              hunk.added ? '++' : '--'
+            }\n`;
+          })
+          .join('')}
+      </Markdown>
+      <View style={styles.video}>
+        {videoChanged && chant.videoUrl ? (
+          <Text variant="titleMedium" style={styles.removed}>
+            {chant.videoUrl}
+          </Text>
+        ) : null}
+        <Text variant="titleMedium" style={videoChanged && styles.added}>
+          {edited.videoUrl}
+        </Text>
+      </View>
     </ScrollView>
   );
 }
@@ -62,14 +141,26 @@ const styles = StyleSheet.create({
     paddingVertical: 10,
     paddingHorizontal: 15,
   },
-  titleInput: {
-    paddingTop: 13,
-  },
-  input: {
-    marginBottom: 20,
-  },
   container: {
     paddingBottom: 80,
+  },
+  title: {
+    marginBottom: 10,
+  },
+  added: {
+    backgroundColor: '#e6ffe6',
+    color: '#22863a',
+  },
+  removed: {
+    backgroundColor: '#ffe6e6',
+    color: '#cb2431',
+  },
+  body: {
+    fontSize: 18,
+    lineHeight: 20,
+  },
+  video: {
+    marginTop: 10,
   },
 });
 

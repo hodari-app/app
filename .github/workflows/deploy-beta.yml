@@ -28,19 +28,22 @@ jobs:
       - name: Install Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: '18'
-
-      - name: Install yarn
-        run: npm install -g yarn
-
-      - name: Upgrade yarn
-        run: corepack enable
+          node-version: '20'
 
       - name: Install Node.js dependencies
-        run: yarn install --frozen-lockfile
+        run: npm install ci
+
+      - name: Setup Ruby
+        uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: '2.7.7'
+          bundler-cache: false
+
+      - name: Install Ruby dependencies
+        run: bundle install
 
       - name: Linter
-        run: yarn lint
+        run: npm run lint
 
       - name: Grant rights
         working-directory: android
@@ -86,12 +89,6 @@ jobs:
           mkdir -p ~/.gradle
           echo "${{ secrets.HODARI_GRADLE_PROPERTIES }}" > ~/.gradle/gradle.properties
 
-      - name: Setup Ruby
-        uses: ruby/setup-ruby@v1
-        with:
-          ruby-version: '2.7'
-          bundler-cache: true
-
       - name: Setup Fastlane
         run: bundle install
 
@@ -112,16 +109,10 @@ jobs:
       - name: Install Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: '18'
-
-      - name: Install yarn
-        run: npm install -g yarn
-
-      - name: Upgrade yarn
-        run: corepack enable
+          node-version: '20'
 
       - name: Install Node.js dependencies
-        run: yarn install --frozen-lockfile
+        run: npm install ci
 
       - name: Cache iOS dependencies
         id: cache-ios-dependencies

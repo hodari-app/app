@@ -18,6 +18,8 @@ import {CombinedDarkTheme, CombinedDefaultTheme} from './theme';
 //   debug: __DEV__,
 // });
 
+const renderIcon = props => <MaterialDesignIcons {...props} />;
+
 function App() {
   const isDarkMode = useColorScheme() === 'dark';
   const theme = isDarkMode ? CombinedDarkTheme : CombinedDefaultTheme;
@@ -35,7 +37,7 @@ function App() {
       <PaperProvider
         theme={theme}
         settings={{
-          icon: props => <MaterialDesignIcons {...props} />,
+          icon: renderIcon,
         }}>
         <NavigationContainer theme={theme}>
           <Routes />
