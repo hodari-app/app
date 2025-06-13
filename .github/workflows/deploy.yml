@@ -98,7 +98,7 @@ jobs:
 
   ios:
     name: iOS App
-    runs-on: macOS-latest
+    runs-on: macos-15
     steps:
       - name: Checkout
         uses: actions/checkout@v4
