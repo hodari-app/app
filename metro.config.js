@@ -1,5 +1,7 @@
 const {getDefaultConfig} = require('@react-native/metro-config');
 
+const {withSentryConfig} = require('@sentry/react-native/metro');
+
 /**
  * Metro configuration
  * https://reactnative.dev/docs/metro
@@ -10,4 +12,4 @@ const config = getDefaultConfig(__dirname);
 
 config.resolver.sourceExts.push('sql');
 
-module.exports = config;
+module.exports = withSentryConfig(config);
