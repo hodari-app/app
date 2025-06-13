@@ -79,7 +79,7 @@ const chantsFilteredState = atom(get => {
   const favoriteFilter = get(favoriteFilterState);
 
   if (searchFilter.length < 3 && !categoryFilter.length && !favoriteFilter) {
-    return chants;
+    return get(chants);
   }
 
   const title = [],
