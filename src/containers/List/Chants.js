@@ -30,12 +30,7 @@ function Chants() {
               <Button onPress={loadChants}>Réessayer</Button>
             </>
           ) : (
-            <>
-              <ActivityIndicator />
-              <Text style={styles.downloadingText}>
-                Téléchargement des chants...
-              </Text>
-            </>
+            <Text style={styles.downloadingText}>Chargement des chants...</Text>
           )}
         </Empty>
       ),
@@ -52,7 +47,7 @@ function Chants() {
         renderItem={({item}) => (
           <List.Item
             style={{height: ITEM_HEIGHT}}
-            onPress={() => navigation.navigate('Chant', {id: item.id})}
+            onPress={() => navigation.navigate('Chant', {chant: item})}
             title={item.title}
           />
         )}

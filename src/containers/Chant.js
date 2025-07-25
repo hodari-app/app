@@ -3,14 +3,15 @@ import {ScrollView, StyleSheet, View} from 'react-native';
 import Markdown from '@ronradtke/react-native-markdown-display';
 import {Appbar, Text, useTheme} from 'react-native-paper';
 import YoutubePlayer from 'react-native-youtube-iframe';
-import {useAtom, useAtomValue} from 'jotai';
+import {useAtom, useAtomValue, useSetAtom} from 'jotai';
 
-import {chantsState, favoritesState} from '../store/store';
+import {chantsState, currentChantState, favoritesState} from '../store/store';
 
 function Chant({navigation, route}) {
-  const {id} = route.params;
+  const {id, chant: chantFromParams} = route.params;
   const theme = useTheme();
   const chants = useAtomValue(chantsState);
+  const setCurrentChant = useSetAtom(currentChantState);
   const [chant, setChant] = useState();
   const [pending, startTransition] = useTransition();
   const [favorites, setFavorites] = useAtom(favoritesState);
@@ -57,9 +58,19 @@ function Chant({navigation, route}) {
 
   useEffect(() => {
     startTransition(() => {
-      setChant(chants.find(c => c.id === id));
+      if (chantFromParams) {
+        setChant(chantFromParams);
+        setCurrentChant(chantFromParams);
+        return;
+      }
+      const currentChant = chants.find(c => c.id === id);
+      if (!currentChant) {
+        navigation.goBack();
+      }
+      setChant(currentChant);
+      setCurrentChant(currentChant);
     });
-  }, [id, chants]);
+  }, [id, chants, navigation, setCurrentChant, chantFromParams]);
 
   if (pending) {
     return <Fragment />;

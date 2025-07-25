@@ -21,6 +21,14 @@ const chantsState = atom(
     db.setChants(update);
   },
 );
+const currentChant = atom(storage.getObject('currentChant', null));
+const currentChantState = atom(
+  get => get(currentChant),
+  (get, set, update) => {
+    set(currentChant, update);
+    storage.setObject('currentChant', update);
+  },
+);
 
 const chantsLoadingState = atom({loading: false, error: false});
 
@@ -112,6 +120,7 @@ const chantsFilteredState = atom(get => {
 export {
   appState,
   chantsState,
+  currentChantState,
   chantsLoadingState,
   favoritesState,
   categoriesState,
