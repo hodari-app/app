@@ -1,4 +1,4 @@
-const api = 'https://hodari-server.pages.dev/';
+const api = 'https://hodari-server.pages.dev';
 
 function getInfo() {
   return fetch(`${api}/hodari.json`).then(res => res.json());
