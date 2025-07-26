@@ -104,6 +104,8 @@ const styles = StyleSheet.create({
   },
   sheet: {
     padding: 10,
+    flexDirection: 'row',
+    flexWrap: 'wrap',
   },
   category: {
     margin: 5,
