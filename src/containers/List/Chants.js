@@ -47,7 +47,7 @@ function Chants() {
         renderItem={({item}) => (
           <List.Item
             style={{height: ITEM_HEIGHT}}
-            onPress={() => navigation.navigate('Chant', {chant: item})}
+            onPress={() => navigation.navigate('Chant', {id: item.id})}
             title={item.title}
           />
         )}

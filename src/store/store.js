@@ -21,12 +21,12 @@ const chantsState = atom(
     db.setChants(update);
   },
 );
-const currentChant = atom(storage.getObject('currentChant', null));
+const currentChant = atom(storage.getString('currentChant'));
 const currentChantState = atom(
   get => get(currentChant),
   (get, set, update) => {
     set(currentChant, update);
-    storage.setObject('currentChant', update);
+    storage.set('currentChant', update || '');
   },
 );
 

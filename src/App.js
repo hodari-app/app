@@ -3,7 +3,6 @@ import {Platform, StatusBar, StyleSheet, useColorScheme} from 'react-native';
 import * as Sentry from '@sentry/react-native';
 import {GestureHandlerRootView} from 'react-native-gesture-handler';
 import {Provider as PaperProvider} from 'react-native-paper';
-import {NavigationContainer} from '@react-navigation/native';
 import MaterialDesignIcons from '@react-native-vector-icons/material-design-icons';
 
 import Routes from './Routes';
@@ -37,9 +36,7 @@ function App() {
         settings={{
           icon: renderIcon,
         }}>
-        <NavigationContainer theme={theme}>
-          <Routes />
-        </NavigationContainer>
+        <Routes theme={theme} />
       </PaperProvider>
     </GestureHandlerRootView>
   );

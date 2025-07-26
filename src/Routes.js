@@ -1,7 +1,9 @@
 import React, {useEffect, useRef} from 'react';
 import {View} from 'react-native';
+import {useAtomValue} from 'jotai';
 import {createNativeStackNavigator} from '@react-navigation/native-stack';
 import {useMigrations} from 'drizzle-orm/op-sqlite/migrator';
+import {NavigationContainer} from '@react-navigation/native';
 // import * as Sentry from '@sentry/react-native';
 
 import {useLoadChants} from './hooks/loadChants';
@@ -12,13 +14,15 @@ import Diff from './containers/Edition/Diff';
 import Webview from './containers/Webview';
 import {db} from './store/database';
 import migrations from './store/migrations/migrations';
+import {currentChantState} from './store/store';
 
 const Main = createNativeStackNavigator();
 
-const Routes = () => {
+const Routes = ({theme}) => {
   const {success, error} = useMigrations(db, migrations);
   const loadedEntities = useRef(false);
   const loadChants = useLoadChants();
+  const currentChantId = useAtomValue(currentChantState);
 
   useEffect(() => {
     if (loadedEntities.current || !success) {
@@ -38,18 +42,34 @@ const Routes = () => {
     return <View />;
   }
 
+  let initialState = null;
+  if (currentChantId) {
+    initialState = {
+      index: 1,
+      routes: [
+        {name: 'TabNavigator'},
+        {
+          name: 'Chant',
+          params: {id: currentChantId},
+        },
+      ],
+    };
+  }
+
   return (
-    <Main.Navigator initialRouteName="TabNavigator">
-      <Main.Screen
-        options={{headerShown: false, title: 'Chants'}}
-        name="TabNavigator"
-        component={ChantsList}
-      />
-      <Main.Screen name="Chant" options={{title: ''}} component={Chant} />
-      <Main.Screen name="Edit" options={{title: ''}} component={Edit} />
-      <Main.Screen name="Diff" options={{title: ''}} component={Diff} />
-      <Main.Screen name="Webview" component={Webview} />
-    </Main.Navigator>
+    <NavigationContainer theme={theme} initialState={initialState}>
+      <Main.Navigator>
+        <Main.Screen
+          options={{headerShown: false, title: 'Chants'}}
+          name="TabNavigator"
+          component={ChantsList}
+        />
+        <Main.Screen name="Chant" options={{title: ''}} component={Chant} />
+        <Main.Screen name="Edit" options={{title: ''}} component={Edit} />
+        <Main.Screen name="Diff" options={{title: ''}} component={Diff} />
+        <Main.Screen name="Webview" component={Webview} />
+      </Main.Navigator>
+    </NavigationContainer>
   );
 };
 

@@ -8,7 +8,7 @@ import {useAtom, useAtomValue, useSetAtom} from 'jotai';
 import {chantsState, currentChantState, favoritesState} from '../store/store';
 
 function Chant({navigation, route}) {
-  const {id, chant: chantFromParams} = route.params;
+  const {id} = route.params;
   const theme = useTheme();
   const chants = useAtomValue(chantsState);
   const setCurrentChant = useSetAtom(currentChantState);
@@ -58,19 +58,17 @@ function Chant({navigation, route}) {
 
   useEffect(() => {
     startTransition(() => {
-      if (chantFromParams) {
-        setChant(chantFromParams);
-        setCurrentChant(chantFromParams);
+      if (!chants.length) {
         return;
       }
       const currentChant = chants.find(c => c.id === id);
       if (!currentChant) {
-        navigation.goBack();
+        navigation.navigate('TabNavigator');
       }
       setChant(currentChant);
-      setCurrentChant(currentChant);
+      setCurrentChant(currentChant.id);
     });
-  }, [id, chants, navigation, setCurrentChant, chantFromParams]);
+  }, [id, chants, navigation, setCurrentChant]);
 
   if (pending) {
     return <Fragment />;
