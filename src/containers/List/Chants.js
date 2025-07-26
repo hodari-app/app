@@ -1,11 +1,15 @@
 import React, {useMemo} from 'react';
 import {StyleSheet, View} from 'react-native';
-import {ActivityIndicator, Button, List, Text} from 'react-native-paper';
+import {Button, List, Text} from 'react-native-paper';
 import {useNavigation} from '@react-navigation/native';
 import {useAtomValue} from 'jotai';
 import {FlashList} from '@shopify/flash-list';
 
-import {chantsFilteredState, chantsLoadingState} from '../../store/store';
+import {
+  chantsFilteredState,
+  chantsLoadingState,
+  chantsState,
+} from '../../store/store';
 import Empty from './Empty';
 import {useLoadChants} from '../../hooks/loadChants';
 
@@ -15,6 +19,7 @@ function Chants() {
   const navigation = useNavigation();
   const loadChants = useLoadChants();
 
+  const chants = useAtomValue(chantsState);
   const {error} = useAtomValue(chantsLoadingState);
   const filtered = useAtomValue(chantsFilteredState);
 
@@ -22,7 +27,7 @@ function Chants() {
     useMemo(
       () => (
         <Empty>
-          {filtered.length ? (
+          {chants.length && !filtered.length ? (
             <Text>Aucun chant ne correspond à votre recherche</Text>
           ) : error ? (
             <>
