@@ -1,7 +1,7 @@
-import React, {useCallback, useMemo, useRef} from 'react';
-import {StyleSheet, View} from 'react-native';
-import {Chip, Portal, useTheme} from 'react-native-paper';
-import {useAtom, useAtomValue} from 'jotai';
+import React, { useCallback, useMemo, useRef } from 'react';
+import { StyleSheet, View } from 'react-native';
+import { Chip, Portal, useTheme } from 'react-native-paper';
+import { useAtom, useAtomValue } from 'jotai';
 import BottomSheet, {
   BottomSheetBackdrop,
   BottomSheetScrollView,
@@ -11,14 +11,12 @@ import {
   appState,
   categoriesState,
   categoryFilterState,
-  favoriteFilterState,
 } from '../../store/store';
 
 function Filters() {
   const theme = useTheme();
   const categories = useAtomValue(categoriesState);
   const [categoryFilter, setCategoryFilter] = useAtom(categoryFilterState);
-  const [favoriteFilter, setFavoriteFilter] = useAtom(favoriteFilterState);
   const app = useAtomValue(appState);
 
   const bottomSheetRef = useRef(null);
@@ -50,18 +48,10 @@ function Filters() {
           mode="outlined"
           style={styles.filterChip}
           icon="filter-outline"
-          onPress={() => bottomSheetRef.current.snapToIndex(0)}>
+          onPress={() => bottomSheetRef.current.snapToIndex(0)}
+        >
           Catégorie
           {categoryFilter.length ? ` (${categoryFilter.length})` : null}
-        </Chip>
-        <Chip
-          mode="outlined"
-          style={styles.filterChip}
-          icon="heart-outline"
-          selected={favoriteFilter}
-          onClose={favoriteFilter ? () => setFavoriteFilter(false) : null}
-          onPress={() => setFavoriteFilter(!favoriteFilter)}>
-          Favoris
         </Chip>
       </View>
       <Portal>
@@ -71,7 +61,8 @@ function Filters() {
           snapPoints={snapPoints}
           backdropComponent={renderBackdrop}
           enablePanDownToClose
-          backgroundStyle={{backgroundColor: theme.colors.background}}>
+          backgroundStyle={{ backgroundColor: theme.colors.background }}
+        >
           <BottomSheetScrollView>
             <View style={styles.sheet}>
               {categories.map(category => (
@@ -80,7 +71,8 @@ function Filters() {
                   mode="outlined"
                   style={styles.category}
                   onPress={() => toggleCategoryFilter(category.name)}
-                  selected={categoryFilter.includes(category.name)}>
+                  selected={categoryFilter.includes(category.name)}
+                >
                   {app?.categories?.[category.name] || category.name} (
                   {category.count})
                 </Chip>

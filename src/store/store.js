@@ -1,7 +1,7 @@
-import {atom} from 'jotai';
+import { atom } from 'jotai';
 
-import {storage} from './storage';
-import {cleanString} from '../utils/string';
+import { storage } from './storage';
+import { cleanString } from '../utils/string';
 import * as db from './database';
 
 const app = atom(storage.getObject('app', {}));
@@ -21,16 +21,35 @@ const chantsState = atom(
     db.setChants(update);
   },
 );
-const currentChant = atom(storage.getString('currentChant'));
-const currentChantState = atom(
-  get => get(currentChant),
+
+const recentsStorage = storage.getObject('recents', []);
+const recents = atom(recentsStorage);
+const recentsState = atom(
+  get => get(recents),
   (get, set, update) => {
-    set(currentChant, update);
-    storage.set('currentChant', update || '');
+    set(recents, update);
+    storage.setObject('recents', update);
   },
 );
+const recentsChants = atom(get => {
+  const ids = get(recentsState);
+  if (!ids.length) {
+    return [];
+  }
+  const indexById = new Map(ids.map((id, index) => [id, index]));
+  const ordered = new Array(ids.length);
+  for (const chant of get(chantsState)) {
+    const pos = indexById.get(chant.id);
+    if (pos !== undefined) {
+      ordered[pos] = chant;
+    }
+  }
+  return ordered.filter(Boolean);
+});
 
-const chantsLoadingState = atom({loading: false, error: false});
+const listModeState = atom(recentsStorage.length ? 'recent' : 'all');
+
+const chantsLoadingState = atom({ loading: false, error: false });
 
 const favorites = atom(storage.getObject('favorites', []));
 const favoritesState = atom(
@@ -40,6 +59,23 @@ const favoritesState = atom(
     storage.setObject('favorites', update);
   },
 );
+const favoritesChants = atom(get => {
+  const favorites = get(favoritesState);
+  return get(chantsState).filter(chant => favorites.includes(chant.id));
+});
+
+const searchFilterState = atom('');
+const categoryFilterState = atom([]);
+
+const chantsCleanedState = atom(get => {
+  return get(chantsState).map(chant => ({
+    ...chant,
+    clean: {
+      title: cleanString(chant.title),
+      body: cleanString(chant.body),
+    },
+  }));
+});
 
 const categoriesState = atom(get => {
   const filteredChants = get(chantsFilteredState);
@@ -60,57 +96,60 @@ const categoriesState = atom(get => {
 
   return Object.keys(categories)
     .sort((a, b) => categories[b] - categories[a])
-    .map(name => ({name, count: categories[name]}));
-});
-
-const searchFilterState = atom('');
-
-const categoryFilterState = atom([]);
-
-const favoriteFilterState = atom(false);
-
-const chantsCleanedState = atom(get => {
-  return get(chantsState).map(chant => ({
-    ...chant,
-    clean: {
-      title: cleanString(chant.title),
-      body: cleanString(chant.body),
-    },
-  }));
+    .map(name => ({ name, count: categories[name] }));
 });
 
 const chantsFilteredState = atom(get => {
-  const cleanedChants = get(chantsCleanedState);
-  const searchFilter = get(searchFilterState);
-  const categoryFilter = get(categoryFilterState);
-  const favoriteState = get(favoritesState);
-  const favoriteFilter = get(favoriteFilterState);
+  const mode = get(listModeState);
+  const allChants = get(chantsCleanedState);
 
-  if (searchFilter.length < 3 && !categoryFilter.length && !favoriteFilter) {
-    return get(chants);
+  if (mode === 'favorites') {
+    return get(favoritesChants);
   }
 
-  const title = [],
-    body = [];
-  for (const chant of cleanedChants) {
-    const {id = '', categories = [], clean} = chant;
+  if (mode === 'recent') {
+    return get(recentsChants);
+  }
 
-    if (favoriteFilter && favoriteState.includes(id)) {
-      title.push(chant);
-    }
+  const categoryFilter = get(categoryFilterState);
+  if (!categoryFilter.length) {
+    return allChants;
+  }
+
+  const title = [];
+  const body = [];
+  for (const chant of allChants) {
+    const { categories = [] } = chant;
+
     if (
       categoryFilter.length &&
       categories.some(c => categoryFilter.includes(c))
     ) {
       title.push(chant);
     }
-    if (searchFilter) {
-      const keyword = cleanString(searchFilter);
-      if (clean.title.includes(keyword)) {
-        title.push(chant);
-      } else if (clean.body.includes(keyword)) {
-        body.push(chant);
-      }
+  }
+
+  return title.concat(body);
+});
+
+const chantsSearchFilteredState = atom(get => {
+  const searchFilter = get(searchFilterState);
+  if (!searchFilter) {
+    return [];
+  }
+
+  const title = [];
+  const body = [];
+  for (const chant of get(chantsCleanedState)) {
+    const { clean } = chant;
+
+    const keyword = cleanString(searchFilter);
+    if (clean.title.includes(keyword)) {
+      title.push(chant);
+      continue;
+    }
+    if (clean.body.includes(keyword)) {
+      body.push(chant);
     }
   }
 
@@ -120,12 +159,13 @@ const chantsFilteredState = atom(get => {
 export {
   appState,
   chantsState,
-  currentChantState,
   chantsLoadingState,
+  listModeState,
   favoritesState,
+  recentsState,
   categoriesState,
   searchFilterState,
   categoryFilterState,
   chantsFilteredState,
-  favoriteFilterState,
+  chantsSearchFilteredState,
 };

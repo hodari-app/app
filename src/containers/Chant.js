@@ -1,23 +1,23 @@
-import React, {Fragment, useEffect, useState, useTransition} from 'react';
-import {ScrollView, StyleSheet, View} from 'react-native';
+import React, { Fragment, useEffect, useState, useTransition } from 'react';
+import { ScrollView, StyleSheet, View } from 'react-native';
 import Markdown from '@ronradtke/react-native-markdown-display';
-import {Appbar, Text, useTheme} from 'react-native-paper';
+import { Appbar, Text, useTheme } from 'react-native-paper';
 import YoutubePlayer from 'react-native-youtube-iframe';
-import {useAtom, useAtomValue, useSetAtom} from 'jotai';
+import { useAtom, useAtomValue } from 'jotai';
 
-import {chantsState, currentChantState, favoritesState} from '../store/store';
+import { chantsState, favoritesState, recentsState } from '../store/store';
 
-function Chant({navigation, route}) {
-  const {id} = route.params;
+function Chant({ navigation, route }) {
+  const { id } = route.params;
   const theme = useTheme();
   const chants = useAtomValue(chantsState);
-  const setCurrentChant = useSetAtom(currentChantState);
   const [chant, setChant] = useState();
   const [pending, startTransition] = useTransition();
   const [favorites, setFavorites] = useAtom(favoritesState);
+  const [recents, setRecents] = useAtom(recentsState);
   const [fontSize, setFontSize] = useState(18);
 
-  const {body, ...metadata} = chant || {body: ''};
+  const { body, ...metadata } = chant || { body: '' };
   const isFavorite = favorites.includes(id);
 
   const toggleFavorite = () => {
@@ -40,7 +40,7 @@ function Chant({navigation, route}) {
       />
       <Appbar.Action
         icon="pencil"
-        onPress={() => navigation.navigate('Edit', {id})}
+        onPress={() => navigation.navigate('Edit', { id })}
       />
       <Appbar.Action
         icon={isFavorite ? 'heart' : 'heart-outline'}
@@ -63,12 +63,18 @@ function Chant({navigation, route}) {
       }
       const currentChant = chants.find(c => c.id === id);
       if (!currentChant) {
-        navigation.navigate('TabNavigator');
+        navigation.navigate('List');
       }
       setChant(currentChant);
-      setCurrentChant(currentChant.id);
     });
-  }, [id, chants, navigation, setCurrentChant]);
+  }, [id, chants, navigation, recents, setRecents]);
+
+  useEffect(() => {
+    if (recents[0] === id) {
+      return;
+    }
+    setRecents([id, ...recents.filter(recentId => recentId !== id)]);
+  }, [id, recents, setRecents]);
 
   if (pending) {
     return <Fragment />;
@@ -78,15 +84,17 @@ function Chant({navigation, route}) {
     <ScrollView
       contentInsetAdjustmentBehavior="automatic"
       style={styles.scrollContainer}
-      contentContainerStyle={styles.container}>
+      contentContainerStyle={styles.container}
+    >
       <Text variant="headlineSmall" style={styles.title}>
         {metadata.title}
       </Text>
       {body ? (
         <Markdown
           style={{
-            body: {color: theme.colors.onSurface, fontSize, lineHeight: 26},
-          }}>
+            body: { color: theme.colors.onSurface, fontSize, lineHeight: 26 },
+          }}
+        >
           {body}
         </Markdown>
       ) : null}
