@@ -60,7 +60,7 @@ function Edit({ navigation, route }) {
   }
 
   return (
-    <SafeAreaView>
+    <SafeAreaView edges={['bottom', 'right', 'left']}>
       <ScrollView
         contentInsetAdjustmentBehavior="automatic"
         style={styles.scrollContainer}
@@ -99,7 +99,7 @@ function Edit({ navigation, route }) {
 const styles = StyleSheet.create({
   scrollContainer: {
     height: '100%',
-    paddingVertical: 10,
+    paddingVertical: 15,
     paddingHorizontal: 15,
   },
   titleInput: {

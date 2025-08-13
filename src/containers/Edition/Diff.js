@@ -94,7 +94,7 @@ function ChantDiff({ navigation, route }) {
   );
 
   return (
-    <SafeAreaView>
+    <SafeAreaView edges={['bottom', 'right', 'left']}>
       <ScrollView
         style={styles.scrollContainer}
         contentContainerStyle={styles.container}
@@ -117,6 +117,9 @@ function ChantDiff({ navigation, route }) {
           {hunksBody
             .map(hunk => {
               if (!hunk.added && !hunk.removed) {
+                return hunk.value;
+              }
+              if (!hunk.value.trim()) {
                 return hunk.value;
               }
               return `${hunk.added ? '++' : '--'}${hunk.value.trim()}${
