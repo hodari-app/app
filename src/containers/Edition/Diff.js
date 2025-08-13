@@ -6,6 +6,7 @@ import React, {
   useCallback,
 } from 'react';
 import { Alert, ScrollView, StyleSheet, View } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import { Appbar, Text } from 'react-native-paper';
 import { useAtomValue } from 'jotai';
 import { diffJson } from 'diff';
@@ -93,47 +94,49 @@ function ChantDiff({ navigation, route }) {
   );
 
   return (
-    <ScrollView
-      style={styles.scrollContainer}
-      contentContainerStyle={styles.container}
-    >
-      <View style={styles.title}>
-        {titleChanged ? (
-          <Text variant="headlineSmall" style={styles.removed}>
-            {chant.title}
-          </Text>
-        ) : null}
-        <Text variant="headlineSmall" style={titleChanged && styles.added}>
-          {edited.title}
-        </Text>
-      </View>
-      <Markdown
-        markdownit={markdownItInstance}
-        style={{ body: styles.body }}
-        rules={{ ins, del }}
+    <SafeAreaView>
+      <ScrollView
+        style={styles.scrollContainer}
+        contentContainerStyle={styles.container}
       >
-        {hunksBody
-          .map(hunk => {
-            if (!hunk.added && !hunk.removed) {
-              return hunk.value;
-            }
-            return `${hunk.added ? '++' : '--'}${hunk.value.trim()}${
-              hunk.added ? '++' : '--'
-            }\n`;
-          })
-          .join('')}
-      </Markdown>
-      <View style={styles.video}>
-        {videoChanged && chant.videoUrl ? (
-          <Text variant="titleMedium" style={styles.removed}>
-            {chant.videoUrl}
+        <View style={styles.title}>
+          {titleChanged ? (
+            <Text variant="headlineSmall" style={styles.removed}>
+              {chant.title}
+            </Text>
+          ) : null}
+          <Text variant="headlineSmall" style={titleChanged && styles.added}>
+            {edited.title}
           </Text>
-        ) : null}
-        <Text variant="titleMedium" style={videoChanged && styles.added}>
-          {edited.videoUrl}
-        </Text>
-      </View>
-    </ScrollView>
+        </View>
+        <Markdown
+          markdownit={markdownItInstance}
+          style={{ body: styles.body }}
+          rules={{ ins, del }}
+        >
+          {hunksBody
+            .map(hunk => {
+              if (!hunk.added && !hunk.removed) {
+                return hunk.value;
+              }
+              return `${hunk.added ? '++' : '--'}${hunk.value.trim()}${
+                hunk.added ? '++' : '--'
+              }\n`;
+            })
+            .join('')}
+        </Markdown>
+        <View style={styles.video}>
+          {videoChanged && chant.videoUrl ? (
+            <Text variant="titleMedium" style={styles.removed}>
+              {chant.videoUrl}
+            </Text>
+          ) : null}
+          <Text variant="titleMedium" style={videoChanged && styles.added}>
+            {edited.videoUrl}
+          </Text>
+        </View>
+      </ScrollView>
+    </SafeAreaView>
   );
 }
 

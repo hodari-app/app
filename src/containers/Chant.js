@@ -1,5 +1,6 @@
 import React, { Fragment, useEffect, useState, useTransition } from 'react';
 import { ScrollView, StyleSheet, View } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import Markdown from '@ronradtke/react-native-markdown-display';
 import { Appbar, Text, useTheme } from 'react-native-paper';
 import YoutubePlayer from 'react-native-youtube-iframe';
@@ -88,37 +89,40 @@ function Chant({ navigation, route }) {
   }
 
   return (
-    <ScrollView
-      contentInsetAdjustmentBehavior="automatic"
-      style={styles.scrollContainer}
-      contentContainerStyle={styles.container}
-    >
-      <Text variant="headlineSmall" style={styles.title}>
-        {metadata.title}
-      </Text>
-      {body ? (
-        <Markdown
-          style={{
+    <SafeAreaView edges={['right', 'left', 'bottom']}>
+      <ScrollView
+        contentInsetAdjustmentBehavior="automatic"
+        style={styles.scrollContainer}
+        contentContainerStyle={styles.container}
+      >
+        <Text variant="headlineSmall" style={styles.title}>
+          {metadata.title}
+        </Text>
+        {body ? (
+          <Markdown
+            style={{
               body: {
                 color: theme.colors.onSurface,
                 fontSize,
                 lineHeight: fontSize * 1.45,
               },
-          }}
-        >
-          {body}
-        </Markdown>
-      ) : null}
-      {metadata?.videoUrl ? (
-        <View style={styles.video} renderToHardwareTextureAndroid>
-          <YoutubePlayer
-            height={190}
-            videoId={metadata.videoUrl.split('=').pop()}
-            play={false}
-          />
-        </View>
-      ) : null}
-    </ScrollView>
+            }}
+          >
+            {body}
+          </Markdown>
+        ) : null}
+        {metadata?.videoUrl ? (
+          <View style={styles.video} renderToHardwareTextureAndroid>
+            <YoutubePlayer
+              height={190}
+              width={320}
+              videoId={metadata.videoUrl.split('=').pop()}
+              play={false}
+            />
+          </View>
+        ) : null}
+      </ScrollView>
+    </SafeAreaView>
   );
 }
 
@@ -129,6 +133,7 @@ const styles = StyleSheet.create({
   },
   container: {
     paddingHorizontal: 10,
+    paddingBottom: 30,
   },
   title: {
     marginBottom: 10,

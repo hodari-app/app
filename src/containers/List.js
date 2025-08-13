@@ -1,5 +1,6 @@
-import React, { Suspense } from 'react';
-import { SafeAreaView, StatusBar, StyleSheet } from 'react-native';
+import React, { startTransition, Suspense } from 'react';
+import { StyleSheet } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import { BottomNavigation, Icon, Searchbar, Text } from 'react-native-paper';
 import { useAtom } from 'jotai';
 import { useNavigation } from '@react-navigation/native';
@@ -25,7 +26,7 @@ function List() {
   );
 
   return (
-    <SafeAreaView style={styles.container}>
+    <SafeAreaView style={styles.container} edges={['top', 'right', 'left']}>
       <Searchbar
         icon="music"
         style={styles.searchBar}
@@ -43,7 +44,9 @@ function List() {
           routes,
         }}
         onTabPress={({ route }) => {
-          setListMode(route.key);
+          startTransition(() => {
+            setListMode(route.key);
+          });
         }}
         renderIcon={({ route, color }) => (
           <Icon source={route.icon} size={24} color={color} />
@@ -57,7 +60,6 @@ function List() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    marginTop: StatusBar.currentHeight + 10,
   },
   searchBar: {
     marginHorizontal: 10,

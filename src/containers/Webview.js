@@ -1,11 +1,12 @@
-import React, {useEffect} from 'react';
-import {useNavigation} from '@react-navigation/native';
-import {SafeAreaView, StyleSheet} from 'react-native';
+import React, { useEffect } from 'react';
+import { StyleSheet } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
+import { useNavigation } from '@react-navigation/native';
 import WebView from 'react-native-webview';
 
-function Webview({route}) {
+function Webview({ route }) {
   const navigation = useNavigation();
-  const {title = '', uri = ''} = route.params;
+  const { title = '', uri = '' } = route.params;
 
   useEffect(() => {
     navigation.setOptions({
@@ -15,7 +16,7 @@ function Webview({route}) {
 
   return (
     <SafeAreaView style={styles.container}>
-      <WebView source={{uri}} />
+      <WebView source={{ uri }} />
     </SafeAreaView>
   );
 }

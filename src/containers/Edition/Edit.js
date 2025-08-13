@@ -5,14 +5,15 @@ import React, {
   useTransition,
   useCallback,
 } from 'react';
-import {ScrollView, StyleSheet} from 'react-native';
-import {Appbar, TextInput} from 'react-native-paper';
-import {useAtomValue} from 'jotai';
+import { ScrollView, StyleSheet } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
+import { Appbar, TextInput } from 'react-native-paper';
+import { useAtomValue } from 'jotai';
 
-import {chantsState} from '../../store/store';
+import { chantsState } from '../../store/store';
 
-function Edit({navigation, route}) {
-  const {id} = route.params;
+function Edit({ navigation, route }) {
+  const { id } = route.params;
   const chants = useAtomValue(chantsState);
   const [original, setOriginal] = useState({});
   const [chant, setChant] = useState({});
@@ -25,13 +26,13 @@ function Edit({navigation, route}) {
         navigation.goBack();
         return;
       }
-      setOriginal({...found, body: found.body.trim()});
-      setChant({...found, body: found.body.trim()});
+      setOriginal({ ...found, body: found.body.trim() });
+      setChant({ ...found, body: found.body.trim() });
     });
   }, [id, chants, navigation]);
 
   const save = useCallback(() => {
-    navigation.navigate('Diff', {id, edited: chant});
+    navigation.navigate('Diff', { id, edited: chant });
   }, [navigation, id, chant]);
 
   const hasChanges =
@@ -59,36 +60,39 @@ function Edit({navigation, route}) {
   }
 
   return (
-    <ScrollView
-      contentInsetAdjustmentBehavior="automatic"
-      style={styles.scrollContainer}
-      contentContainerStyle={styles.container}>
-      <TextInput
-        mode="outlined"
-        label="Titre"
-        onChangeText={t => setChant({...chant, title: t.trim()})}
-        value={chant.title}
-        style={styles.input}
-        contentStyle={styles.titleInput}
-        multiline
-      />
-      <TextInput
-        mode="outlined"
-        label="Paroles"
-        onChangeText={body => setChant({...chant, body})}
-        value={chant.body}
-        style={styles.input}
-        multiline
-      />
-      <TextInput
-        mode="outlined"
-        label="URL vidéo YouTube"
-        onChangeText={t => setChant({...chant, videoUrl: t.trim()})}
-        value={chant.videoUrl}
-        style={styles.input}
-        multiline
-      />
-    </ScrollView>
+    <SafeAreaView>
+      <ScrollView
+        contentInsetAdjustmentBehavior="automatic"
+        style={styles.scrollContainer}
+        contentContainerStyle={styles.container}
+      >
+        <TextInput
+          mode="outlined"
+          label="Titre"
+          onChangeText={t => setChant({ ...chant, title: t.trim() })}
+          value={chant.title}
+          style={styles.input}
+          contentStyle={styles.titleInput}
+          multiline
+        />
+        <TextInput
+          mode="outlined"
+          label="Paroles"
+          onChangeText={body => setChant({ ...chant, body })}
+          value={chant.body}
+          style={styles.input}
+          multiline
+        />
+        <TextInput
+          mode="outlined"
+          label="URL vidéo YouTube"
+          onChangeText={t => setChant({ ...chant, videoUrl: t.trim() })}
+          value={chant.videoUrl}
+          style={styles.input}
+          multiline
+        />
+      </ScrollView>
+    </SafeAreaView>
   );
 }
 

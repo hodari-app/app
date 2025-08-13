@@ -1,9 +1,10 @@
 import React from 'react';
-import {SafeAreaView, ScrollView, StatusBar, StyleSheet} from 'react-native';
-import {List} from 'react-native-paper';
-import {useNavigation} from '@react-navigation/native';
+import { ScrollView, StatusBar, StyleSheet } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
+import { List } from 'react-native-paper';
+import { useNavigation } from '@react-navigation/native';
 
-import {version} from '../../package.json';
+import { version } from '../../package.json';
 
 function About() {
   const navigation = useNavigation();

@@ -1,5 +1,6 @@
 import React, { useEffect, useMemo, useRef } from 'react';
-import { SafeAreaView, StatusBar, StyleSheet } from 'react-native';
+import { StatusBar, StyleSheet } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import { List, Searchbar, Text } from 'react-native-paper';
 import { useAtom, useAtomValue } from 'jotai';
 import { useNavigation } from '@react-navigation/native';
