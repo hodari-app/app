@@ -14,8 +14,6 @@ import {
 import { useLoadChants } from '../../hooks/loadChants';
 import Empty from './Empty';
 
-const ITEM_HEIGHT = 47;
-
 function Chants() {
   const navigation = useNavigation();
   const loadChants = useLoadChants();
@@ -63,13 +61,12 @@ function Chants() {
         data={displayedChants}
         renderItem={({ item }) => (
           <List.Item
-            style={{ height: ITEM_HEIGHT }}
+            style={styles.item}
             onPress={() => navigation.navigate('Chant', { id: item.id })}
             title={item.title}
           />
         )}
         keyExtractor={item => item.id}
-        estimatedItemSize={ITEM_HEIGHT}
         keyboardShouldPersistTaps="always"
         ListEmptyComponent={EmptyList}
       />
@@ -86,6 +83,9 @@ const styles = StyleSheet.create({
     paddingVertical: 10,
     borderBottomColor: '#ccc',
     borderBottomWidth: StyleSheet.hairlineWidth,
+  },
+  item: {
+    height: 47,
   },
 });
 
