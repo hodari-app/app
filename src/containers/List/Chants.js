@@ -20,44 +20,47 @@ function Chants() {
   const navigation = useNavigation();
   const loadChants = useLoadChants();
   const listMode = useAtomValue(listModeState);
-  const chants = useAtomValue(chantsState);
   const { error } = useAtomValue(chantsLoadingState);
-  const filtered = useAtomValue(chantsFilteredState);
+  const chants = useAtomValue(chantsState);
+  const displayedChants = useAtomValue(chantsFilteredState);
 
   const EmptyList = () =>
-    useMemo(
-      () => (
-        <Empty>
-          {chants.length && !filtered.length ? (
-            listMode === 'all' ? (
-              <Text>Aucun chant ne correspond à votre recherche</Text>
-            ) : listMode === 'favorites' ? (
-              <Text>Aucun chant en favoris</Text>
-            ) : (
-              <Text>Aucun chant récent</Text>
-            )
-          ) : error ? (
-            <>
-              <Text>Une erreur est survenue durant le chargement</Text>
-              <Button onPress={loadChants}>Réessayer</Button>
-            </>
-          ) : (
+    useMemo(() => {
+      if (error) {
+        return (
+          <Empty>
+            <Text>Une erreur est survenue durant le chargement</Text>
+            <Button onPress={loadChants}>Réessayer</Button>
+          </Empty>
+        );
+      }
+      if (!chants.length) {
+        return (
+          <Empty>
             <Text style={styles.downloadingText}>Chargement des chants...</Text>
-          )}
+          </Empty>
+        );
+      }
+      return (
+        <Empty>
+          <Text>
+            {listMode === 'favorites'
+              ? 'Aucun chant en favoris'
+              : 'Aucun chant récent'}
+          </Text>
         </Empty>
-      ),
-      [filtered], // eslint-disable-line react-hooks/exhaustive-deps
-    );
+      );
+    }, [error, listMode, chants]); // eslint-disable-line react-hooks/exhaustive-deps
 
   return (
     <>
       {listMode === 'all' && (
         <View style={styles.actionBar}>
-          <Text>{filtered.length} chants</Text>
+          <Text>{displayedChants.length} chants</Text>
         </View>
       )}
       <FlashList
-        data={filtered}
+        data={displayedChants}
         renderItem={({ item }) => (
           <List.Item
             style={{ height: ITEM_HEIGHT }}
