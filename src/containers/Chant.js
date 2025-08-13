@@ -20,6 +20,13 @@ function Chant({ navigation, route }) {
   const { body, ...metadata } = chant || { body: '' };
   const isFavorite = favorites.includes(id);
 
+  const updateFontSize = size => {
+    setFontSize(old => {
+      const newSize = old + size;
+      return newSize < 14 || newSize > 35 ? old : newSize;
+    });
+  };
+
   const toggleFavorite = () => {
     if (isFavorite) {
       setFavorites(favorites.filter(favoriteId => favoriteId !== id));
@@ -32,11 +39,11 @@ function Chant({ navigation, route }) {
     <>
       <Appbar.Action
         icon="format-font-size-decrease"
-        onPress={() => setFontSize(c => c - 1)}
+        onPress={() => updateFontSize(-1)}
       />
       <Appbar.Action
         icon="format-font-size-increase"
-        onPress={() => setFontSize(c => c + 1)}
+        onPress={() => updateFontSize(1)}
       />
       <Appbar.Action
         icon="pencil"
@@ -92,7 +99,11 @@ function Chant({ navigation, route }) {
       {body ? (
         <Markdown
           style={{
-            body: { color: theme.colors.onSurface, fontSize, lineHeight: 26 },
+              body: {
+                color: theme.colors.onSurface,
+                fontSize,
+                lineHeight: fontSize * 1.45,
+              },
           }}
         >
           {body}
