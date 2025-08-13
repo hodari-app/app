@@ -5,18 +5,18 @@ import React, {
   useTransition,
   useCallback,
 } from 'react';
-import {Alert, ScrollView, StyleSheet, View} from 'react-native';
-import {Appbar, Text} from 'react-native-paper';
-import {useAtomValue} from 'jotai';
-import jsDiff from 'diff';
-import Markdown, {MarkdownIt} from '@ronradtke/react-native-markdown-display';
+import { Alert, ScrollView, StyleSheet, View } from 'react-native';
+import { Appbar, Text } from 'react-native-paper';
+import { useAtomValue } from 'jotai';
+import { diffJson } from 'diff';
+import Markdown, { MarkdownIt } from '@ronradtke/react-native-markdown-display';
 
-import {chantsState} from '../../store/store';
-import {editChant} from '../../api/chants';
+import { chantsState } from '../../store/store';
+import { editChant } from '../../api/chants';
 import pluginIns from '../../plugins/markdown-it-ins';
 import pluginDel from '../../plugins/markdown-it-del';
 
-const markdownItInstance = new MarkdownIt({typographer: true})
+const markdownItInstance = new MarkdownIt({ typographer: true })
   .use(pluginIns, {
     containerClassName: 'ins',
   })
@@ -24,8 +24,8 @@ const markdownItInstance = new MarkdownIt({typographer: true})
     containerClassName: 'del',
   });
 
-function ChantDiff({navigation, route}) {
-  const {id, edited} = route.params;
+function ChantDiff({ navigation, route }) {
+  const { id, edited } = route.params;
   const chants = useAtomValue(chantsState);
   const [chant, setChant] = useState({});
   const [pending, startTransition] = useTransition();
@@ -37,7 +37,7 @@ function ChantDiff({navigation, route}) {
         navigation.goBack();
         return;
       }
-      setChant({...found, body: found.body.trim()});
+      setChant({ ...found, body: found.body.trim() });
     });
   }, [id, chants, navigation]);
 
@@ -54,7 +54,7 @@ function ChantDiff({navigation, route}) {
           text: 'Confirmer',
           onPress: async () => {
             console.log(await editChant(edited));
-            navigation.popTo('Chant', {id});
+            navigation.popTo('Chant', { id });
           },
         },
       ],
@@ -76,7 +76,7 @@ function ChantDiff({navigation, route}) {
     return <Fragment />;
   }
 
-  const hunksBody = jsDiff.diffJson(chant.body, edited.body);
+  const hunksBody = diffJson(chant.body, edited.body);
   const titleChanged = edited.title !== chant.title;
   const videoChanged = edited.videoUrl !== chant.videoUrl;
 
@@ -95,7 +95,8 @@ function ChantDiff({navigation, route}) {
   return (
     <ScrollView
       style={styles.scrollContainer}
-      contentContainerStyle={styles.container}>
+      contentContainerStyle={styles.container}
+    >
       <View style={styles.title}>
         {titleChanged ? (
           <Text variant="headlineSmall" style={styles.removed}>
@@ -108,8 +109,9 @@ function ChantDiff({navigation, route}) {
       </View>
       <Markdown
         markdownit={markdownItInstance}
-        style={{body: styles.body}}
-        rules={{ins, del}}>
+        style={{ body: styles.body }}
+        rules={{ ins, del }}
+      >
         {hunksBody
           .map(hunk => {
             if (!hunk.added && !hunk.removed) {
