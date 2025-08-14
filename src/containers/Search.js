@@ -13,8 +13,6 @@ import {
 } from '../store/store';
 import Empty from './List/Empty';
 
-const ITEM_HEIGHT = 47;
-
 function Search() {
   const ref = useRef(null);
   const navigation = useNavigation();
@@ -66,13 +64,12 @@ function Search() {
         data={filtered}
         renderItem={({ item }) => (
           <List.Item
-            style={{ height: ITEM_HEIGHT }}
+            style={styles.item}
             onPress={() => navigation.navigate('Chant', { id: item.id })}
             title={item.title}
           />
         )}
         keyExtractor={item => item.id}
-        estimatedItemSize={ITEM_HEIGHT}
         keyboardShouldPersistTaps="always"
         ListEmptyComponent={EmptyList}
       />
@@ -94,6 +91,9 @@ const styles = StyleSheet.create({
     right: 0,
     backgroundColor: 'white',
     zIndex: 1000,
+  },
+  item: {
+    height: 50,
   },
 });
 

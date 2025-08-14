@@ -69,6 +69,7 @@ function Chants() {
         keyExtractor={item => item.id}
         keyboardShouldPersistTaps="always"
         ListEmptyComponent={EmptyList}
+        maintainVisibleContentPosition={{ disabled: true }}
       />
     </>
   );
@@ -85,7 +86,7 @@ const styles = StyleSheet.create({
     borderBottomWidth: StyleSheet.hairlineWidth,
   },
   item: {
-    height: 47,
+    height: 50,
   },
 });
 
