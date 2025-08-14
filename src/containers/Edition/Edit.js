@@ -5,7 +5,7 @@ import React, {
   useTransition,
   useCallback,
 } from 'react';
-import { ScrollView, StyleSheet } from 'react-native';
+import { KeyboardAvoidingView, ScrollView, StyleSheet } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Appbar, TextInput } from 'react-native-paper';
 import { useAtomValue } from 'jotai';
@@ -61,37 +61,42 @@ function Edit({ navigation, route }) {
 
   return (
     <SafeAreaView edges={['bottom', 'right', 'left']}>
-      <ScrollView
-        contentInsetAdjustmentBehavior="automatic"
-        style={styles.scrollContainer}
-        contentContainerStyle={styles.container}
-      >
-        <TextInput
-          mode="outlined"
-          label="Titre"
-          onChangeText={t => setChant({ ...chant, title: t.trim() })}
-          value={chant.title}
-          style={styles.input}
-          contentStyle={styles.titleInput}
-          multiline
-        />
-        <TextInput
-          mode="outlined"
-          label="Paroles"
-          onChangeText={body => setChant({ ...chant, body })}
-          value={chant.body}
-          style={styles.input}
-          multiline
-        />
-        <TextInput
-          mode="outlined"
-          label="URL vidéo YouTube"
-          onChangeText={t => setChant({ ...chant, videoUrl: t.trim() })}
-          value={chant.videoUrl}
-          style={styles.input}
-          multiline
-        />
-      </ScrollView>
+      <KeyboardAvoidingView behavior="padding">
+        <ScrollView
+          contentInsetAdjustmentBehavior="automatic"
+          style={styles.scrollContainer}
+          contentContainerStyle={styles.container}
+        >
+          <TextInput
+            mode="outlined"
+            label="Titre"
+            onChangeText={t => setChant({ ...chant, title: t.trim() })}
+            value={chant.title}
+            style={styles.input}
+            contentStyle={styles.titleInput}
+            scrollEnabled={false}
+            multiline
+          />
+          <TextInput
+            mode="outlined"
+            label="Paroles"
+            onChangeText={body => setChant({ ...chant, body })}
+            value={chant.body}
+            style={styles.input}
+            scrollEnabled={false}
+            multiline
+          />
+          <TextInput
+            mode="outlined"
+            label="URL vidéo YouTube"
+            onChangeText={t => setChant({ ...chant, videoUrl: t.trim() })}
+            value={chant.videoUrl}
+            style={styles.input}
+            scrollEnabled={false}
+            multiline
+          />
+        </ScrollView>
+      </KeyboardAvoidingView>
     </SafeAreaView>
   );
 }
@@ -109,7 +114,7 @@ const styles = StyleSheet.create({
     marginBottom: 20,
   },
   container: {
-    paddingBottom: 80,
+    paddingBottom: 200,
   },
 });
 

@@ -16,9 +16,10 @@ function editChant(chant) {
   return fetch(`${api}/chant/${chant.id}`, {
     method: 'PUT',
     body: JSON.stringify({
-      body: chant,
+      content: chant,
+      title: chant.title,
     }),
   }).then(res => res.json());
 }
 
-export {getInfo, getChants, getChant, editChant};
+export { getInfo, getChants, getChant, editChant };
