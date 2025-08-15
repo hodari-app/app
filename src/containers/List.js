@@ -1,23 +1,56 @@
-import React, { startTransition, Suspense } from 'react';
+import React, { Suspense } from 'react';
 import { StyleSheet } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { BottomNavigation, Icon, Searchbar, Text } from 'react-native-paper';
-import { useAtom } from 'jotai';
 import { useNavigation } from '@react-navigation/native';
+import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
+import { CommonActions } from '@react-navigation/native';
 
-import { listModeState } from '../store/store';
 import Chants from './List/Chants';
-import Filters from './List/Filters';
 import Empty from './List/Empty';
+
+const Tab = createBottomTabNavigator();
+
+const CustomTabBar = ({ navigation, state, descriptors, insets }) => (
+  <BottomNavigation.Bar
+    navigationState={state}
+    safeAreaInsets={insets}
+    onTabPress={({ route, preventDefault }) => {
+      const event = navigation.emit({
+        type: 'tabPress',
+        target: route.key,
+        canPreventDefault: true,
+      });
+
+      if (event.defaultPrevented) {
+        preventDefault();
+      } else {
+        navigation.dispatch({
+          ...CommonActions.navigate(route.name, route.params),
+          target: state.key,
+        });
+      }
+    }}
+    renderIcon={({ route, focused, color }) => (
+      <Icon
+        source={descriptors[route.key].options.icon}
+        size={24}
+        color={color}
+      />
+    )}
+    getLabelText={({ route }) => {
+      const { options } = descriptors[route.key];
+      return typeof options.tabBarLabel === 'string'
+        ? options.tabBarLabel
+        : typeof options.title === 'string'
+        ? options.title
+        : route.name;
+    }}
+  />
+);
 
 function List() {
   const navigation = useNavigation();
-  const [listMode, setListMode] = useAtom(listModeState);
-  const routes = [
-    { key: 'all', title: 'Tous', icon: 'music' },
-    { key: 'recent', title: 'Récents', icon: 'history' },
-    { key: 'favorites', title: 'Favoris', icon: 'heart' },
-  ];
 
   const fallback = (
     <Empty>
@@ -35,24 +68,24 @@ function List() {
         disabled
       />
       <Suspense fallback={fallback}>
-        {listMode === 'all' && <Filters />}
-        <Chants />
+        <Tab.Navigator
+          screenOptions={{
+            animation: 'shift',
+            headerShown: false,
+          }}
+          tabBar={CustomTabBar}
+        >
+          <Tab.Screen name="Tous" options={{ icon: 'music' }}>
+            {() => <Chants mode="all" />}
+          </Tab.Screen>
+          <Tab.Screen name="Récents" options={{ icon: 'history' }}>
+            {() => <Chants mode="recent" />}
+          </Tab.Screen>
+          <Tab.Screen name="Favoris" options={{ icon: 'heart' }}>
+            {() => <Chants mode="favorites" />}
+          </Tab.Screen>
+        </Tab.Navigator>
       </Suspense>
-      <BottomNavigation.Bar
-        navigationState={{
-          index: routes.findIndex(r => r.key === listMode),
-          routes,
-        }}
-        onTabPress={({ route }) => {
-          startTransition(() => {
-            setListMode(route.key);
-          });
-        }}
-        renderIcon={({ route, color }) => (
-          <Icon source={route.icon} size={24} color={color} />
-        )}
-        getLabelText={({ route }) => route.title}
-      />
     </SafeAreaView>
   );
 }

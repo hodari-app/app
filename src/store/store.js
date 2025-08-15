@@ -47,8 +47,6 @@ const recentsChants = atom(get => {
   return ordered.filter(Boolean);
 });
 
-const listModeState = atom(recentsStorage.length ? 'recent' : 'all');
-
 const chantsLoadingState = atom({ loading: false, error: false });
 
 const favorites = atom(storage.getObject('favorites', []));
@@ -78,7 +76,7 @@ const chantsCleanedState = atom(get => {
 });
 
 const categoriesState = atom(get => {
-  const filteredChants = get(chantsFilteredState);
+  const filteredChants = get(allChantsState);
   const categories = {};
 
   for (const chant of filteredChants) {
@@ -99,17 +97,8 @@ const categoriesState = atom(get => {
     .map(name => ({ name, count: categories[name] }));
 });
 
-const chantsFilteredState = atom(get => {
-  const mode = get(listModeState);
+const allChantsState = atom(get => {
   const allChants = get(chantsCleanedState);
-
-  if (mode === 'favorites') {
-    return get(favoritesChants);
-  }
-
-  if (mode === 'recent') {
-    return get(recentsChants);
-  }
 
   const categoryFilter = get(categoryFilterState);
   if (!categoryFilter.length) {
@@ -160,12 +149,13 @@ export {
   appState,
   chantsState,
   chantsLoadingState,
-  listModeState,
+  allChantsState,
   favoritesState,
+  favoritesChants,
   recentsState,
+  recentsChants,
   categoriesState,
   searchFilterState,
   categoryFilterState,
-  chantsFilteredState,
   chantsSearchFilteredState,
 };
