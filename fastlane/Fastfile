@@ -4,6 +4,7 @@ platform :ios do
     setup_ci if ENV['CI']
     match(app_identifier: 'com.hodari', type: 'appstore', readonly: true)
     increment_version_number(version_number: ENV['VERSION_NUMBER'], xcodeproj: './ios/hodari.xcodeproj')
+    xcode_select('/Applications/Xcode_16.4.app')
     build_app(scheme: 'hodari', workspace: './ios/hodari.xcworkspace', silent: true, suppress_xcode_output: true)
   end
   
