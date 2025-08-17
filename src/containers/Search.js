@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useRef } from 'react';
+import React, { useCallback, useEffect, useMemo, useRef } from 'react';
 import { StyleSheet } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { List, Searchbar, Text } from 'react-native-paper';
@@ -43,6 +43,17 @@ function Search() {
       [],
     );
 
+  const renderItem = useCallback(
+    ({ item }) => (
+      <List.Item
+        style={styles.item}
+        onPress={() => navigation.navigate('Chant', { id: item.id })}
+        title={item.title}
+      />
+    ),
+    [navigation],
+  );
+
   return (
     <SafeAreaView style={styles.container}>
       <Searchbar
@@ -62,16 +73,11 @@ function Search() {
       />
       <FlashList
         data={filtered}
-        renderItem={({ item }) => (
-          <List.Item
-            style={styles.item}
-            onPress={() => navigation.navigate('Chant', { id: item.id })}
-            title={item.title}
-          />
-        )}
+        renderItem={renderItem}
         keyExtractor={item => item.id}
         keyboardShouldPersistTaps="always"
         ListEmptyComponent={EmptyList}
+        maintainVisibleContentPosition={{ disabled: true }}
       />
     </SafeAreaView>
   );
